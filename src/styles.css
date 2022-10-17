@@ -1,0 +1,29 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.focus-user-info {
+  background-color: rgba(0, 0, 10, 0.1);
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.search-input {
+  width: 300px;
+  height: 40px;
+}
+
+.user_info_field {
+  border: solid black 2px;
+  width: 300px;
+}
