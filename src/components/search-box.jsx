@@ -1,41 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import getUserInfo from "../api/get-user-info";
 
 export default function SearchBox() {
   const [userInfo, setUserInfo] = useState(null);
   const [filteredUserInfo, setFilteredUserInfo] = useState(null);
   const [itemInFocus, setItemInFocus] = useState(null);
+  const [scrollRef, setScrollRef] = useState(null);
 
-  const mouseOverListener = (e) => {
-    const userInfoElementDiv = e.target?.parentElement?.parentElement;
+  useEffect(() => {
+    (() =>
+      scrollRef?.[itemInFocus]?.current.scrollIntoView({
+        block: "nearest"
+      }))();
+  }, [scrollRef, itemInFocus]);
+
+  const mouseOverListener = useCallback((e) => {
+    const userInfoElementDiv = e.target?.parentElement;
     const userInfoElementIdx = userInfoElementDiv?.id;
     if (userInfoElementIdx !== "") {
       setItemInFocus((prev) => +userInfoElementIdx);
     }
-  };
+  }, []);
 
-  const ArrowKeyListener = (e) => {
-    if (e.code === "ArrowUp") {
-      setItemInFocus((prev) => {
-        return prev === null
-          ? 0
-          : prev === 0
-          ? filteredUserInfo.length - 1
-          : prev - 1;
-      });
-    }
-    if (e.code === "ArrowDown") {
-      setItemInFocus((prev) =>
-        prev === null ? 0 : prev === filteredUserInfo.length - 1 ? 0 : prev + 1
-      );
-    }
-  };
+  const ArrowKeyListener = useCallback(
+    (e) => {
+      if (e.code === "ArrowUp") {
+        setItemInFocus((prev) => {
+          return prev === null
+            ? 0
+            : prev <= 0
+            ? filteredUserInfo.length - 1
+            : prev - 1;
+        });
+      }
+      if (e.code === "ArrowDown") {
+        setItemInFocus((prev) => {
+          return prev === null
+            ? 0
+            : prev >= filteredUserInfo.length - 1
+            ? 0
+            : prev + 1;
+        });
+      }
+    },
+    [filteredUserInfo]
+  );
 
   useEffect(() => {
     async function fetchData() {
       const _userInfo = await getUserInfo();
 
       setUserInfo(_userInfo);
+      const _scrollIntoView = _userInfo.reduce((acc, item, idx) => {
+        acc[idx] = React.createRef();
+        return acc;
+      }, {});
+      setScrollRef(_scrollIntoView);
     }
 
     fetchData();
@@ -69,37 +89,47 @@ export default function SearchBox() {
     };
   }
   return (
-    <div tabIndex="1" onKeyDown={(e) => ArrowKeyListener(e)}>
+    <div>
       <label htmlFor="userSearch">Search User:</label>
       <div className="search-container">
         <input
-          tabIndex="2"
           className="search-input"
           type="search"
           id="userSearch"
           onChange={handleChange()}
         />
-        <div tabIndex="3">
+        <ul>
           {filteredUserInfo?.map((info, idx) => {
+            const ref = React.createRef();
+
             return (
-              <div
+              <li
+                ref={scrollRef[idx]}
+                tabIndex={0}
                 id={idx}
                 key={info.id}
-                className="user_info_field"
-                onMouseOver={(e) => mouseOverListener(e)}
+                className={
+                  itemInFocus === idx
+                    ? "focus-user-info user_info_field"
+                    : "user_info_field"
+                }
+                onKeyDown={(e) => {
+                  ArrowKeyListener(e);
+                }}
+                onMouseOver={(e) => {
+                  mouseOverListener(e);
+                }}
               >
-                <div className={itemInFocus === idx ? "focus-user-info" : null}>
-                  <span>
-                    UserName:{info.first_name} {info.last_name}
-                  </span>
-                  <span>; Address:{info.address}</span>
-                  <span>; Email:{info.email}</span>
-                  <span>; Gender:{info.gender}</span>
-                </div>
-              </div>
+                <span ref={ref}>
+                  UserName:{info.first_name} {info.last_name}
+                </span>
+                <span>; Address:{info.address}</span>
+                <span>; Email:{info.email}</span>
+                <span>; Gender:{info.gender}</span>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </div>
   );

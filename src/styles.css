@@ -8,6 +8,10 @@
   gap: 4px;
 }
 
+li {
+  list-style: none;
+}
+
 .focus-user-info {
   background-color: rgba(0, 0, 10, 0.1);
 }
