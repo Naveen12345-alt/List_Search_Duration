@@ -8,6 +8,11 @@
   gap: 4px;
 }
 
+ul {
+  margin-top: 0px;
+  margin-left: -40px;
+}
+
 li {
   list-style: none;
 }
@@ -29,5 +34,5 @@ li {
 
 .user_info_field {
   border: solid black 2px;
-  width: 300px;
+  width: 296px;
 }

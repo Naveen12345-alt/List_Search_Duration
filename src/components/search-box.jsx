@@ -10,12 +10,13 @@ export default function SearchBox() {
   useEffect(() => {
     (() =>
       scrollRef?.[itemInFocus]?.current.scrollIntoView({
-        block: "nearest"
+        block: "nearest",
+        inline: "nearest"
       }))();
   }, [scrollRef, itemInFocus]);
 
   const mouseOverListener = useCallback((e) => {
-    const userInfoElementDiv = e.target?.parentElement;
+    const userInfoElementDiv = e.target;
     const userInfoElementIdx = userInfoElementDiv?.id;
     if (userInfoElementIdx !== "") {
       setItemInFocus((prev) => +userInfoElementIdx);
@@ -35,15 +36,17 @@ export default function SearchBox() {
       }
       if (e.code === "ArrowDown") {
         setItemInFocus((prev) => {
-          return prev === null
-            ? 0
-            : prev >= filteredUserInfo.length - 1
-            ? 0
-            : prev + 1;
+          const newVal =
+            prev === null
+              ? 0
+              : prev >= filteredUserInfo.length - 1
+              ? 0
+              : prev + 1;
+          return newVal;
         });
       }
     },
-    [filteredUserInfo]
+    [itemInFocus]
   );
 
   useEffect(() => {
@@ -100,11 +103,8 @@ export default function SearchBox() {
         />
         <ul>
           {filteredUserInfo?.map((info, idx) => {
-            const ref = React.createRef();
-
             return (
               <li
-                ref={scrollRef[idx]}
                 tabIndex={0}
                 id={idx}
                 key={info.id}
@@ -113,14 +113,16 @@ export default function SearchBox() {
                     ? "focus-user-info user_info_field"
                     : "user_info_field"
                 }
+                ref={scrollRef[idx]}
                 onKeyDown={(e) => {
+                  e.nativeEvent.stopImmediatePropagation();
                   ArrowKeyListener(e);
                 }}
-                onMouseOver={(e) => {
+                onMouseMove={(e) => {
                   mouseOverListener(e);
                 }}
               >
-                <span ref={ref}>
+                <span>
                   UserName:{info.first_name} {info.last_name}
                 </span>
                 <span>; Address:{info.address}</span>
