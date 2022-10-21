@@ -104,6 +104,7 @@ export default function SearchBox() {
         });
 
         filteredData = filteredData.filter((data) => data !== null);
+        setItemInFocus(null);
         setFilteredUserInfo(filteredData);
       }
     };
