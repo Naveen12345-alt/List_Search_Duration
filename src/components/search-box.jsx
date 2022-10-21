@@ -81,7 +81,24 @@ export default function SearchBox() {
             }
           );
           if (_filteredUserInfo.length) {
-            return info;
+            const objInfo = {};
+            for (let prop in info) {
+              objInfo[prop] =
+                typeof info[prop] === "string"
+                  ? info[prop].replace(
+                      new RegExp(searchString, "gi"),
+                      (match) => `+/${match}+`
+                    )
+                  : info[prop];
+              typeof objInfo[prop] === "string" &&
+                (objInfo[prop] = objInfo?.[prop].split("+").map((str) => {
+                  if (str.startsWith("/")) {
+                    return <strong>{str.replace("/", "")}</strong>;
+                  }
+                  return str;
+                }));
+            }
+            return objInfo;
           }
           return null;
         });
@@ -107,7 +124,7 @@ export default function SearchBox() {
               <li
                 tabIndex={0}
                 id={idx}
-                key={info.id}
+                key={idx}
                 className={
                   itemInFocus === idx
                     ? "focus-user-info user_info_field"
