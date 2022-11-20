@@ -115,9 +115,13 @@ export default function SearchBox() {
       <div className="search-container">
         <input
           className="search-input"
-          type="search"
+          type="text"
           id="userSearch"
           onChange={handleChange()}
+          onKeyDown={(e) => {
+            e.nativeEvent.stopImmediatePropagation();
+            ArrowKeyListener(e);
+          }}
         />
         <ul>
           {filteredUserInfo?.map((info, idx) => {
