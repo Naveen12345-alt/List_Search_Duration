@@ -36,3 +36,7 @@ li {
   border: solid black 2px;
   width: 296px;
 }
+
+strong {
+  color: blue;
+}
